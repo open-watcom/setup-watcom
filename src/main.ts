@@ -1,6 +1,7 @@
 import { ISetupWatcomSettings } from "./interface";
 import * as core from "@actions/core";
 import * as tc from "@actions/tool-cache";
+import * as io from "@actions/io";
 import * as path from "path";
 import * as fs from "fs";
 
@@ -79,11 +80,10 @@ async function run(): Promise<void> {
     core.info(`path_subdir: ${settings.path_subdir}`);
 
     try {
-      fs.mkdirSync(settings.location, { recursive: true });
+      await io.mkdirP(settings.location);
     } catch (error) {
       console.log(`mkdir failed with message ${error}`)
     }
-    // await fs.promises.mkdir(settings.location, { recursive: true }, ()=>{} );
     core.info(`${settings.location} created.`);
 
     const watcom_tar_path = await tc.downloadTool(settings.url);
