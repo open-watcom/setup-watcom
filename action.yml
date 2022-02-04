@@ -1,0 +1,25 @@
+name: 'Setup Open Watcom'
+description: 'Setup an Open Watcom environment'
+branding:
+  color: yellow
+  icon: download-cload
+inputs:
+  version:
+    description: 'Open Watcom version'
+    required: false
+    default: '2.0'
+  tag:
+    description: 'Tag of snapshot to use: Variant of the environment to set by default: current or last'
+    required: false
+    default: null
+  location:
+    description: 'Location where Open Watcom should be extracted to'
+    required: false
+    default: null
+  environment:
+    description: 'Set environment variables (WATCOM + PATH)'
+    required: false
+    default: true
+runs:
+  using: 'node12'
+  main: 'index.js'
