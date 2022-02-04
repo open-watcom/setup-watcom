@@ -79,23 +79,29 @@ async function run(): Promise<void> {
     core.info(`environment: ${settings.environment}`);
     core.info(`path_subdir: ${settings.path_subdir}`);
 
+    // Ignore settings.location
+    let override_location = path.join(__dirname, "watcom");
+    core.info(`Use this location instead: ${override_location}.`);
+
     try {
-      await io.mkdirP(settings.location);
+      fs.mkdirSync(override_location);
+      //await io.mkdirP(settings.location);
     } catch (error) {
       console.log(`mkdir failed with message ${error}`)
     }
-    core.info(`${settings.location} created.`);
+    core.info(`${override_location} created.`);
 
     const watcom_tar_path = await tc.downloadTool(settings.url);
     core.info(`Watcom archive downloaded to ${watcom_tar_path}.`);
 
-    const watcom_path = await tc.extractTar(watcom_tar_path, settings.location);
+    const watcom_path = await tc.extractTar(watcom_tar_path, override_location);
     core.info(`Archive extracted.`);
 
     if (settings.environment) {
       core.exportVariable("WATCOM", watcom_path);
-      core.addPath(path.join(watcom_path, settings.path_subdir));
-      core.info(`Environment variables set.`);
+      let bin_path = path.join(watcom_path, settings.path_subdir);
+      core.addPath(bin_path);
+      core.info(`PATH appended with ${bin_path}.`);
     }
   } catch (error) {
     if (error instanceof Error) {
