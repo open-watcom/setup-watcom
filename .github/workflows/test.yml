@@ -1,0 +1,41 @@
+on:
+  - pull_request
+  - push
+  - release
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build setup-watcom
+        run: |
+          ./build.sh
+      - name: Archive artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: action-artifact
+          path: |
+            packed/index.js
+
+
+  test-default:
+    needs: build
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      matrix:
+        runner:
+          - ubuntu-latest
+          - windows-latest
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: action-artifact
+      - name: Run action
+        run: |
+          node main.js
+      - name: Use watcom
+        run: |
+          wcl -h
+          wcl386 -h
+
