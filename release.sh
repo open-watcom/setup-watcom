@@ -18,7 +18,7 @@ rm -rf dist
 mkdir dist
 cp README.md LICENSE action.yml packed/index.js dist/
 cd dist
-git init
+git clone "$GIT_ORIGIN"
 git checkout --orphan "$1"
 git add .
 git config --local user.email "$GIT_EMAIL"
