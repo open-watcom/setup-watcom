@@ -16,8 +16,8 @@ See [action.yml](action.yml)
 Basic:
 ```yaml
 steps:
-- uses: actions/checkout@v2
-- uses: madebr/setup-watcom@0.0.1
+- uses: open-watcom/checkout@v2
+- uses: open-watcom/setup-watcom@0.0.1
 - run: |
     wcl386 -zq -d+ ${{ env.WATCOM }}/h -w3 -bt=dos -d2 -fomain.c.obj -c -cc main.c
     wlink option quiet name hello.exe opt map system dos4g debug all file main.c.obj

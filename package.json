@@ -4,7 +4,7 @@
   "description": "Open Watcom Setup GitHub Action",
   "repository": {
     "type": "git",
-    "url": "https://github.com/madebr/setup-watcom.git"
+    "url": "https://github.com/open-watcom/setup-watcom.git"
   },
   "scripts": {
     "build": "tsc",
@@ -23,9 +23,9 @@
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/madebr/setup-watcom/issues"
+    "url": "https://github.com/open-watcom/setup-watcom/issues"
   },
-  "homepage": "https://github.com/madebr/setup-watcom",
+  "homepage": "https://github.com/open-watcom/setup-watcom",
   "dependencies": {
     "@actions/tool-cache": "^1.7.1",
     "@actions/core": "^1.6.0",
