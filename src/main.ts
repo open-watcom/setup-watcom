@@ -92,8 +92,9 @@ async function run(): Promise<void> {
     core.endGroup();
 
     if (settings.environment) {
-      core.startGroup("Settings environment");
+      core.startGroup("Setting environment.");
       core.exportVariable("WATCOM", watcom_path);
+      core.info(`Setted WATCOM=${watcom_path}`)
       let bin_path = path.join(watcom_path, settings.path_subdir);
       core.addPath(bin_path);
       core.info(`PATH appended with ${bin_path}.`);
