@@ -19,7 +19,8 @@ jobs:
           path: |
             index.js
 
-  test-default:
+  test-2_0:
+    name: "OpenWatcom 2.0 on ${{ matrix.runner }}"
     needs: build
     runs-on: ${{ matrix.runner }}
     strategy:
@@ -32,11 +33,38 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: action-artifact
-      - name: Run action
+      - name: "Run action"
         run: |
           node index.js
         env:
           INPUT_VERSION: "2.0"
+          INPUT_TAG: ""
+          INPUT_LOCATION: ""
+          INPUT_ENVIRONMENT: "true"
+      - name: Use watcom
+        run: |
+          wcl -h
+          wcl386 -h
+
+  test-1_9:
+    name: "OpenWatcom 1.9 on ${{ matrix.runner }}"
+    needs: build
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      matrix:
+        runner:
+          - ubuntu-latest
+          - windows-latest
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: action-artifact
+      - name: "Run action"
+        run: |
+          node index.js
+        env:
+          INPUT_VERSION: "1.9"
           INPUT_TAG: ""
           INPUT_LOCATION: ""
           INPUT_ENVIRONMENT: "true"

@@ -1,3 +1,5 @@
+export type ArchiveType = "exe" | "tar";
+
 export interface ISetupWatcomSettings {
   /**
    * The requested Open Watcom version
@@ -5,14 +7,14 @@ export interface ISetupWatcomSettings {
   version: string;
 
   /**
-   * The requested tag
-   */
-  tag: string;
-
-  /**
    * The download url
    */
   url: string;
+
+  /**
+   * Archive type
+   */
+  archive_type: ArchiveType,
 
   /**
    * The destination path
@@ -28,4 +30,10 @@ export interface ISetupWatcomSettings {
    * Watcom subdir containing the native binaries
    */
   path_subdir: string;
+
+  /**
+   * Need mode bits fix-up
+   */
+  needs_chmod: boolean,
+
 }
