@@ -48,7 +48,7 @@ function getInputs(): ISetupWatcomSettings {
   } else if (process.platform === "darwin") {
     throw new Error("Unsupported platform");
   } else {
-    default_location = "/watcom";
+    default_location = "/opt/watcom";
     p_path_subdir = "binl";
   }
 
@@ -79,22 +79,10 @@ async function run(): Promise<void> {
     core.info(`environment: ${settings.environment}`);
     core.info(`path_subdir: ${settings.path_subdir}`);
 
-    // Ignore settings.location
-    let override_location = path.join(__dirname, "watcom");
-    core.info(`Use this location instead: ${override_location}.`);
-
-    try {
-      fs.mkdirSync(override_location);
-      //await io.mkdirP(settings.location);
-    } catch (error) {
-      console.log(`mkdir failed with message ${error}`)
-    }
-    core.info(`${override_location} created.`);
-
     const watcom_tar_path = await tc.downloadTool(settings.url);
     core.info(`Watcom archive downloaded to ${watcom_tar_path}.`);
 
-    const watcom_path = await tc.extractTar(watcom_tar_path, override_location);
+    const watcom_path = await tc.extractTar(watcom_tar_path, settings.location);
     core.info(`Archive extracted.`);
 
     if (settings.environment) {
