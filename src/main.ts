@@ -71,6 +71,7 @@ function getInputs(): ISetupWatcomSettings {
 
 async function run(): Promise<void> {
   try {
+    core.startGroup("Initializing action.");
     const settings = getInputs();
     core.info(`version: ${settings.version}`);
     core.info(`tag: ${settings.tag}`);
@@ -78,18 +79,25 @@ async function run(): Promise<void> {
     core.info(`location: ${settings.location}`);
     core.info(`environment: ${settings.environment}`);
     core.info(`path_subdir: ${settings.path_subdir}`);
+    core.endGroup();
 
+    core.startGroup(`Downloading ${settings.url}.`);
     const watcom_tar_path = await tc.downloadTool(settings.url);
     core.info(`Watcom archive downloaded to ${watcom_tar_path}.`);
+    core.endGroup();
 
+    core.startGroup(`Extracting to ${settings.location}.`)
     const watcom_path = await tc.extractTar(watcom_tar_path, settings.location);
     core.info(`Archive extracted.`);
+    core.endGroup();
 
     if (settings.environment) {
+      core.startGroup("Settings environment");
       core.exportVariable("WATCOM", watcom_path);
       let bin_path = path.join(watcom_path, settings.path_subdir);
       core.addPath(bin_path);
       core.info(`PATH appended with ${bin_path}.`);
+      core.endGroup();
     }
   } catch (error) {
     if (error instanceof Error) {
