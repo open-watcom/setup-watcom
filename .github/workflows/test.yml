@@ -35,6 +35,11 @@ jobs:
       - name: Run action
         run: |
           node index.js
+        env:
+          INPUT_VERSION: 2.0
+          INPUT_TAG:
+          INPUT_LOCATION:
+          INPUT_ENVIRONMENT: true
       - name: Use watcom
         run: |
           wcl -h
