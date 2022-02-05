@@ -10,13 +10,14 @@ jobs:
       - name: Build setup-watcom
         run: |
           ./build.sh
+          mv packed/index.js index.js
       - name: Archive artifact
         uses: actions/upload-artifact@v2
         with:
           name: action-artifact
+          if-no-files-found: error
           path: |
-            packed/index.js
-
+            index.js
 
   test-default:
     needs: build
@@ -33,9 +34,8 @@ jobs:
           name: action-artifact
       - name: Run action
         run: |
-          node main.js
+          node index.js
       - name: Use watcom
         run: |
           wcl -h
           wcl386 -h
-
