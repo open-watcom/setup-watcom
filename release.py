@@ -3,7 +3,6 @@ import argparse
 import logging
 import os
 import pathlib
-import pygit2
 import subprocess
 import shutil
 
@@ -34,25 +33,10 @@ def main():
   logging.debug(f"ROOT={ROOT}")
   logging.debug(f"DIST_PATH={DIST_PATH}")
 
-  repo = pygit2.Repository(ROOT)
+  subprocess.check_call(["git", "diff", "--exit-code"], stdout=subprocess.DEVNULL)
 
-  modified_files = []
-  for file, file_status in repo.status().items():
-    if not file_status & pygit2.GIT_STATUS_IGNORED:
-      modified_files.append(file)
-  if modified_files:
-    raise RuntimeError(f"The following files are dirty: {modified_files}")
-    return 1
-
-  commit_hash = repo.head.target.hex
-  remote_origin = repo.remotes["origin"]
-  origin_url = remote_origin.url
-  user_name = repo.config.get_multivar("user.name").next()
-  user_email = repo.config.get_multivar("user.email").next()
-  logging.debug(f"commit hash {commit_hash}")
-  logging.debug(f"remote url: {origin_url}")
-  logging.debug(f"user name: {user_name}")
-  logging.debug(f"user email: {user_email}")
+  commit_hash = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
+  origin_url = subprocess.check_output(["git", "remote", "get-url", "origin"], text=True).strip()
 
   logging.info("Removing dist folder")
   try:
@@ -64,18 +48,15 @@ def main():
   logging.debug("Creating dist folder")
   DIST_PATH.mkdir()
 
-  logging.debug("Cloning reo into dist folder")
+  logging.debug("Cloning repo into dist folder")
   subprocess.check_call(["git", "clone", "-b", build_branch, "--depth", "2", "--", origin_url, "."], cwd=DIST_PATH)
 
-  logging.debug("Configuring repo in dist folder")
-  new_repo = pygit2.Repository(DIST_PATH)
-  new_repo.config.set_multivar("user.name", ".*", user_name)
-  new_repo.config.set_multivar("user.email", ".*", user_email)
-
   logging.debug("Removing all files from previous releases")
-  for item in new_repo.revparse_single("HEAD").tree:
-    if os.path.isdir(item.name):
-      shutil.rmtree(os.path.join(DIST_PATH, os.item.name))
+  for item in DIST_PATH.iterdir():
+    if item.name == ".git":
+      continue
+    if item.is_dir():
+      shutil.rmtree(DIST_PATH / item)
     else:
       os.unlink(os.path.join(DIST_PATH, item.name))
 
@@ -84,12 +65,8 @@ def main():
     shutil.copy(ROOT / item, os.path.join(DIST_PATH, pathlib.Path(item).name))
 
   logging.debug("Creating new commit")
-  idx = new_repo.index
-  idx.add_all()
-  idx.write()
-  new_tree = idx.write_tree()
-  new_parent, new_ref = new_repo.resolve_refish(refish=new_repo.head.name)
-  new_repo.create_commit(new_ref.name, new_repo.default_signature, new_repo.default_signature, f"{commit_hash} for {args.version}", new_tree, [new_parent.oid])
+  subprocess.check_call(["git", "add", *[pathlib.Path(file).name for file in RELEASE_FILES]], cwd=DIST_PATH)
+  subprocess.check_call(["git", "commit", "-m", f"{commit_hash} for {args.version}"], cwd=DIST_PATH)
 
   logging.debug("Removing local %s tag", args.version)
   subprocess.call(["git", "tag", "-d", args.version], cwd=DIST_PATH)
