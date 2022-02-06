@@ -60,6 +60,10 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
+      - name: Configure user
+        run: |
+          git config --global user.name 'Open Watcom'
+          git config --global user.email '2045606+open-watcom@users.noreply.github.com'
       - name: Build setup-watcom
         run: |
           ./build.sh
