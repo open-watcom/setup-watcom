@@ -50,3 +50,17 @@ jobs:
         run: |
           wcl -h
           wcl386 -h
+
+  release:
+    name: "Create release"
+    needs: test
+    runs-on: "ubuntu-latest"
+    if: ${{ (github.repository == 'open-watcom/setup-watcom') && (github.ref_name == 'master') }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build setup-watcom
+        run: |
+          ./build.sh
+      - name: Create release
+        run: |
+          ./package.py v0
