@@ -58,6 +58,7 @@ jobs:
     if: ${{ (github.repository == 'open-watcom/setup-watcom') && (github.ref_name == 'master') }}
     steps:
       - uses: actions/checkout@v2
+      - uses: fregante/setup-git-user@v1
       - name: Build setup-watcom
         run: |
           ./build.sh
