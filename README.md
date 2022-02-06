@@ -16,7 +16,7 @@ See [action.yml](action.yml)
 Basic:
 ```yaml
 steps:
-- uses: open-watcom/checkout@v2
+- uses: actions/checkout@v2
 - uses: open-watcom/setup-watcom@v0
 - run: |
     wcl386 -zq -d+ ${{ env.WATCOM }}/h -w3 -bt=dos -d2 -fomain.c.obj -c -cc main.c
