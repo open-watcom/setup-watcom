@@ -5,7 +5,7 @@ branding:
   icon: download-cload
 inputs:
   version:
-    description: 'Open Watcom version: choices = [1.8, 1.9, 2.0]'
+    description: 'Open Watcom version: choices = [1.8, 1.9, 2.0, 2.0-64]'
     required: false
     default: '2.0'
   tag:

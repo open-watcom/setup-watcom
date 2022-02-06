@@ -7,7 +7,7 @@ import * as child_process from "child_process";
 
 function getInputs(): ISetupWatcomSettings {
   let p_version = core.getInput("version");
-  const version_allowed = ["1.8", "1.9", "2.0"];
+  const version_allowed = ["1.8", "1.9", "2.0", "2.0-64"];
 
   if (!version_allowed.includes(p_version.toLowerCase())) {
     throw new Error(
@@ -22,7 +22,7 @@ function getInputs(): ISetupWatcomSettings {
   let p_archive_type: ArchiveType;
 
   let tag_default: string;
-  if (p_version == "2.0") {
+  if (p_version == "2.0" || p_version == "2.0-64") {
     tag_default = "current";
     let tag = core.getInput("tag");
     if (!tag) {
@@ -54,12 +54,20 @@ function getInputs(): ISetupWatcomSettings {
   let p_path_subdir: string;
   if (process.platform === "win32") {
     default_location = "C:\\watcom";
-    p_path_subdir = "binnt";
+    if (p_version == "2.0-64") {
+      p_path_subdir = "binnt64";
+    } else {
+      p_path_subdir = "binnt";
+    }
   } else if (process.platform === "darwin") {
     throw new Error("Unsupported platform");
   } else {
     default_location = "/opt/watcom";
-    p_path_subdir = "binl";
+    if (p_version == "2.0-64") {
+      p_path_subdir = "binl64";
+    } else {
+      p_path_subdir = "binl";
+    }
   }
 
   let p_location = core.getInput("location");
@@ -112,7 +120,7 @@ async function run(): Promise<void> {
 
     if (settings.needs_chmod && process.platform != "win32") {
       core.startGroup(`Fixing file mode bits`);
-      child_process.exec("find . -regex \"./[a-z][a-z0-9]*\" -exec chmod a+x {} \\;", {cwd: path.join(watcom_path, "binl")});
+      child_process.exec("find . -regex \"./[a-z][a-z0-9]*\" -exec chmod a+x {} \\;", {cwd: path.join(watcom_path, settings.path_subdir)});
       core.endGroup();
     }
 
