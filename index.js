@@ -41,7 +41,7 @@ const path = __importStar(__nccwpck_require__(17));
 const child_process = __importStar(__nccwpck_require__(81));
 function getInputs() {
     let p_version = core.getInput("version");
-    const version_allowed = ["1.9", "2.0"];
+    const version_allowed = ["1.8", "1.9", "2.0"];
     if (!version_allowed.includes(p_version.toLowerCase())) {
         throw new Error(`"version" needs to be one of ${version_allowed.join(", ")}, got ${p_version}`);
     }
@@ -68,6 +68,11 @@ function getInputs() {
     }
     else if (p_version == "1.9") {
         p_url = `https://github.com/open-watcom/open-watcom-1.9/releases/download/ow1.9/open-watcom-c-linux-1.9`;
+        p_needs_chmod = true;
+        p_archive_type = "exe";
+    }
+    else if (p_version == "1.8") {
+        p_url = `https://github.com/open-watcom/open-watcom-1.9/releases/download/ow1.8/open-watcom-c-linux-1.8`;
         p_needs_chmod = true;
         p_archive_type = "exe";
     }
