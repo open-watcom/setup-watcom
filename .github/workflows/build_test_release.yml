@@ -69,4 +69,4 @@ jobs:
           python -m pip install -r requirements.txt
       - name: Create release
         run: |
-          ./package.py v0
+          ./release.py v0
