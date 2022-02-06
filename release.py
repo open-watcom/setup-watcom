@@ -51,6 +51,10 @@ def main():
   logging.debug("Cloning repo into dist folder")
   subprocess.check_call(["git", "clone", "-b", build_branch, "--depth", "2", "--", origin_url, "."], cwd=DIST_PATH)
 
+  logging.debug("Configure user and email")
+  subprocess.check_call(["git", "config", "user.name", "Watcom Release Script"], cwd=DIST_PATH)
+  subprocess.check_call(["git", "config", "user.email", "Watcom-Release-Script@example.com"], cwd=DIST_PATH)
+
   logging.debug("Removing all files from previous releases")
   for item in DIST_PATH.iterdir():
     if item.name == ".git":
