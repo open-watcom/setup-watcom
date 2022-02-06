@@ -3,11 +3,13 @@ import argparse
 import logging
 import os
 import pathlib
+from re import L
 import subprocess
 import shutil
+import tempfile
+import tarfile
 
 ROOT = pathlib.Path(__file__).resolve().parent
-DIST_PATH = ROOT / "dist"
 
 VALID_VERSION_SERIES = ("v0", )
 RELEASE_FILES = [
@@ -31,61 +33,63 @@ def main():
   build_branch = f"{args.version}-build"
 
   logging.debug(f"ROOT={ROOT}")
-  logging.debug(f"DIST_PATH={DIST_PATH}")
 
-  subprocess.check_call(["git", "diff", "--exit-code"], stdout=subprocess.DEVNULL)
+  # subprocess.check_call(["git", "diff", "--exit-code"], stdout=subprocess.DEVNULL)
 
-  commit_hash = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
-  origin_url = subprocess.check_output(["git", "remote", "get-url", "origin"], text=True).strip()
+  logging.debug("Determining current branch")
+  current_branch = subprocess.check_output(["git", "branch", "--show-current"], text=True, cwd=ROOT).strip()
+  logging.info(f"Current branch=%s", current_branch)
 
-  logging.info("Removing dist folder")
-  try:
-    shutil.rmtree(DIST_PATH)
-  except FileNotFoundError:
-    logging.debug("The dist folder was already removed")
-    pass
+  logging.debug("Determining current git hash")
+  commit_hash = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True, cwd=ROOT).strip()
+  logging.info(f"Current git hash=%s", commit_hash)
 
-  logging.debug("Creating dist folder")
-  DIST_PATH.mkdir()
+  with tempfile.NamedTemporaryFile() as tar_tmp:
+    tar_tmp.close()
 
-  logging.debug("Cloning repo into dist folder")
-  subprocess.check_call(["git", "clone", "-b", build_branch, "--depth", "2", "--", origin_url, "."], cwd=DIST_PATH)
+    logging.debug("Creating a TAR with all release files")
+    with tarfile.open(tar_tmp.name, mode="w:gz") as f:
+      for release_file in RELEASE_FILES:
+        tarinfo = f.gettarinfo(release_file)
+        tarinfo.name = os.path.basename(release_file)
+        f.addfile(tarinfo, open(release_file, "rb"))
+      f.close()
 
-  logging.debug("Configure user and email")
-  subprocess.check_call(["git", "config", "user.name", "Watcom Release Script"], cwd=DIST_PATH)
-  subprocess.check_call(["git", "config", "user.email", "Watcom-Release-Script@example.com"], cwd=DIST_PATH)
+    logging.debug("Checking out %s", build_branch)
+    subprocess.check_call(["git", "checkout", build_branch], cwd=ROOT)
 
-  logging.debug("Removing all files from previous releases")
-  for item in DIST_PATH.iterdir():
-    if item.name == ".git":
-      continue
-    if item.is_dir():
-      shutil.rmtree(DIST_PATH / item)
-    else:
-      os.unlink(os.path.join(DIST_PATH, item.name))
+    logging.debug("Removing all files from previous releases")
+    for item in ROOT.iterdir():
+      if item.name == ".git":
+        continue
+      if item.is_dir():
+        shutil.rmtree(ROOT / item)
+      else:
+        os.unlink(os.path.join(ROOT, item.name))
 
-  logging.debug("Copying file for new release")
-  for item in RELEASE_FILES:
-    shutil.copy(ROOT / item, os.path.join(DIST_PATH, pathlib.Path(item).name))
+    with tarfile.open(tar_tmp.name, mode="r") as f:
+      f.extractall()
 
   logging.debug("Creating new commit")
-  subprocess.check_call(["git", "add", *[pathlib.Path(file).name for file in RELEASE_FILES]], cwd=DIST_PATH)
-  subprocess.check_call(["git", "commit", "-m", f"{commit_hash} for {args.version}"], cwd=DIST_PATH)
+  subprocess.check_call(["git", "add", *[pathlib.Path(file).name for file in RELEASE_FILES]], cwd=ROOT)
+  subprocess.check_call(["git", "commit", "--allow-empty", "-m", f"{commit_hash} for {args.version}"], cwd=ROOT)
 
   logging.debug("Removing local %s tag", args.version)
-  subprocess.call(["git", "tag", "-d", args.version], cwd=DIST_PATH)
+  subprocess.call(["git", "tag", "-d", args.version], cwd=ROOT)
 
   logging.debug("Creating local %s tag", args.version)
-  subprocess.check_call(["git", "tag", args.version], cwd=DIST_PATH)
+  subprocess.check_call(["git", "tag", args.version], cwd=ROOT)
 
   logging.debug("Pushing commits to origin")
-  subprocess.check_call(["git", "push", "origin", build_branch], cwd=DIST_PATH)
+  # subprocess.check_call(["git", "push", "origin", build_branch], cwd=ROOT)
 
   logging.debug("Force pushing tag to origin")
-  subprocess.check_call(["git", "push", "origin", "-f", args.version], cwd=DIST_PATH)
+  # subprocess.check_call(["git", "push", "origin", "-f", args.version], cwd=ROOT)
+
+  logging.debug("Moving back to %s", current_branch)
+  subprocess.check_call(["git", "checkout", current_branch], cwd=ROOT)
 
   print(f"Release {args.version} created!")
-
 
 if __name__ == "__main__":
   raise SystemExit(main())
