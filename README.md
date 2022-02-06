@@ -22,6 +22,6 @@ steps:
     wcl386 -zq -d+ ${{ env.WATCOM }}/h -w3 -bt=dos -d2 -fomain.c.obj -c -cc main.c
     wlink option quiet name hello.exe opt map system dos4g debug all file main.c.obj
 - run: |
-    cmake -S . -B build -DCMAKE_TOOLCHAIN=watcom-DOS.cmake
+    cmake -S . -B build -G "Watcom WMake" -D CMAKE_SYSTEM_NAME=DOS
     cmake --build build
 ```
