@@ -61,18 +61,29 @@ def main():
     logging.debug("The dist folder was already removed")
     pass
 
+  logging.debug("Creating dist folder")
   DIST_PATH.mkdir()
+
+  logging.debug("Cloning reo into dist folder")
   subprocess.check_call(["git", "clone", "-b", build_branch, "--depth", "2", "--", origin_url, "."], cwd=DIST_PATH)
+
+  logging.debug("Configuring repo in dist folder")
   new_repo = pygit2.Repository(DIST_PATH)
   new_repo.config.set_multivar("user.name", ".*", user_name)
   new_repo.config.set_multivar("user.email", ".*", user_email)
+
+  logging.debug("Removing all files from previous releases")
   for item in new_repo.revparse_single("HEAD").tree:
     if os.path.isdir(item.name):
       shutil.rmtree(os.path.join(DIST_PATH, os.item.name))
     else:
       os.unlink(os.path.join(DIST_PATH, item.name))
+
+  logging.debug("Copying file for new release")
   for item in RELEASE_FILES:
     shutil.copy(ROOT / item, os.path.join(DIST_PATH, pathlib.Path(item).name))
+
+  logging.debug("Creating new commit")
   idx = new_repo.index
   idx.add_all()
   idx.write()
@@ -83,17 +94,16 @@ def main():
   logging.debug("Removing local %s tag", args.version)
   subprocess.call(["git", "tag", "-d", args.version], cwd=DIST_PATH)
 
-  logging.debug("Removing %s tag from origin", args.version)
-  subprocess.check_call(["git", "push", "origin", f":{args.version}"], cwd=DIST_PATH)
-
   logging.debug("Creating local %s tag", args.version)
   subprocess.check_call(["git", "tag", args.version], cwd=DIST_PATH)
 
   logging.debug("Pushing commits to origin")
   subprocess.check_call(["git", "push", "origin", build_branch], cwd=DIST_PATH)
 
-  logging.debug("Pushing tag to origin")
-  subprocess.check_call(["git", "push", "origin", args.version], cwd=DIST_PATH)
+  logging.debug("Force pushing tag to origin")
+  subprocess.check_call(["git", "push", "origin", "-f", args.version], cwd=DIST_PATH)
+
+  print(f"Release {args.version} created!")
 
 
 if __name__ == "__main__":
