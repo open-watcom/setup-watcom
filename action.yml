@@ -9,7 +9,7 @@ inputs:
     required: false
     default: '2.0'
   tag:
-    description: 'Tag of snapshot to use: current, last or data. (only used for 2.0)'
+    description: 'Tag of snapshot to use: current, last or date. (only used for 2.0)'
     required: false
     default: null
   location:
