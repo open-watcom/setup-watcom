@@ -41,7 +41,7 @@ const path = __importStar(__nccwpck_require__(17));
 const child_process = __importStar(__nccwpck_require__(81));
 function getInputs() {
     let p_version = core.getInput("version");
-    const version_allowed = ["1.8", "1.9", "2.0"];
+    const version_allowed = ["1.8", "1.9", "2.0", "2.0-64"];
     if (!version_allowed.includes(p_version.toLowerCase())) {
         throw new Error(`"version" needs to be one of ${version_allowed.join(", ")}, got ${p_version}`);
     }
@@ -49,7 +49,7 @@ function getInputs() {
     let p_needs_chmod = false;
     let p_archive_type;
     let tag_default;
-    if (p_version == "2.0") {
+    if (p_version == "2.0" || p_version == "2.0-64") {
         tag_default = "current";
         let tag = core.getInput("tag");
         if (!tag) {
@@ -83,14 +83,24 @@ function getInputs() {
     let p_path_subdir;
     if (process.platform === "win32") {
         default_location = "C:\\watcom";
-        p_path_subdir = "binnt";
+        if (p_version == "2.0-64") {
+            p_path_subdir = "binnt64";
+        }
+        else {
+            p_path_subdir = "binnt";
+        }
     }
     else if (process.platform === "darwin") {
         throw new Error("Unsupported platform");
     }
     else {
         default_location = "/opt/watcom";
-        p_path_subdir = "binl";
+        if (p_version == "2.0-64") {
+            p_path_subdir = "binl64";
+        }
+        else {
+            p_path_subdir = "binl";
+        }
     }
     let p_location = core.getInput("location");
     if (!p_location) {
@@ -139,7 +149,7 @@ function run() {
             core.endGroup();
             if (settings.needs_chmod && process.platform != "win32") {
                 core.startGroup(`Fixing file mode bits`);
-                child_process.exec("find . -regex \"./[a-z][a-z0-9]*\" -exec chmod a+x {} \\;", { cwd: path.join(watcom_path, "binl") });
+                child_process.exec("find . -regex \"./[a-z][a-z0-9]*\" -exec chmod a+x {} \\;", { cwd: path.join(watcom_path, settings.path_subdir) });
                 core.endGroup();
             }
             if (settings.environment) {
