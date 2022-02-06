@@ -81,10 +81,10 @@ def main():
   subprocess.check_call(["git", "tag", args.version], cwd=ROOT)
 
   logging.debug("Pushing commits to origin")
-  # subprocess.check_call(["git", "push", "origin", build_branch], cwd=ROOT)
+  subprocess.check_call(["git", "push", "origin", build_branch], cwd=ROOT)
 
   logging.debug("Force pushing tag to origin")
-  # subprocess.check_call(["git", "push", "origin", "-f", args.version], cwd=ROOT)
+  subprocess.check_call(["git", "push", "origin", "-f", args.version], cwd=ROOT)
 
   logging.debug("Moving back to %s", current_branch)
   subprocess.check_call(["git", "checkout", current_branch], cwd=ROOT)
