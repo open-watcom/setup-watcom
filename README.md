@@ -27,3 +27,5 @@ steps:
     cmake -S . -B build -G "Watcom WMake" -D CMAKE_SYSTEM_NAME=DOS
     cmake --build build
 ```
+
+Supported OW version is 1.8, 1.9, 2.0 and 2.0-64
