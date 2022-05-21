@@ -36,7 +36,7 @@ function getInputs(): ISetupWatcomSettings {
       tag = tag_aliases[tag];
     }
     p_url =
-      `https://github.com/open-watcom/open-watcom-v2/releases/download/${tag}/ow-snapshot.tar.gz`;
+      `https://github.com/open-watcom/open-watcom-v2/releases/download/${tag}/ow-snapshot.tar.xz`;
       p_archive_type = "tar";
   } else if (p_version == "1.9") {
     p_url = `https://github.com/open-watcom/open-watcom-1.9/releases/download/ow1.9/open-watcom-c-linux-1.9`;
