@@ -107,9 +107,13 @@ async function run(): Promise<void> {
     core.startGroup(`Extracting to ${settings.location}.`)
     let watcom_path: fs.PathLike = "";
     if (settings.archive_type == "tar") {
-      watcom_path = await tc.extractTar(watcom_tar_path, settings.location, "x");
+      if (process.platform === "win32") {
+        watcom_path = await tc.extract7z(watcom_tar_path, settings.location);
+      } else {
+        watcom_path = await tc.extractTar(watcom_tar_path, settings.location, "x");
+      }
     } else if (settings.archive_type == "exe") {
-      if (process.platform == "win32") {
+      if (process.platform === "win32") {
         watcom_path = await tc.extractZip(watcom_tar_path, settings.location);
       } else {
         watcom_path = await tc.extractZip(watcom_tar_path, settings.location);
