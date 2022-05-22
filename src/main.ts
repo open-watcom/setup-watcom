@@ -107,6 +107,9 @@ async function run(): Promise<void> {
     core.startGroup(`Extracting to ${settings.location}.`)
     let watcom_path: fs.PathLike = "";
     if (settings.archive_type == "tar") {
+      if (process.platform == "win32") {
+        core.addPath("C:\msys64\usr\bin");
+      }
       watcom_path = await tc.extractTar(watcom_tar_path, settings.location, "x");
     } else if (settings.archive_type == "exe") {
       watcom_path = await tc.extractZip(watcom_tar_path, settings.location);
@@ -114,10 +117,12 @@ async function run(): Promise<void> {
     core.info(`Archive extracted.`);
     core.endGroup();
 
-    if (settings.needs_chmod && process.platform != "win32") {
-      core.startGroup(`Fixing file mode bits`);
-      child_process.exec("find . -regex \"./[a-z][a-z0-9]*\" -exec chmod a+x {} \\;", {cwd: path.join(watcom_path, settings.path_subdir)});
-      core.endGroup();
+    if (settings.archive_type == "exe") {
+      if (settings.needs_chmod && process.platform != "win32") {
+        core.startGroup(`Fixing file mode bits`);
+        child_process.exec("find . -regex \"./[a-z][a-z0-9]*\" -exec chmod a+x {} \\;", {cwd: path.join(watcom_path, settings.path_subdir)});
+        core.endGroup();
+      }
     }
 
     if (settings.environment) {
