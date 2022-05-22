@@ -109,8 +109,10 @@ async function run(): Promise<void> {
     let watcom_path: fs.PathLike = "";
     if (settings.archive_type == "tar") {
       if (process.platform == "win32") {
-        exec.exec("C:\\msys64\\usr\\bin\\xz.exe", ["-c", "-d", watcom_tar_path, "| tar x -f - -C", settings.location]);
-        watcom_path = settings.location;
+        const originalPath = process.env['Path'];
+        process.env['Path'] = `C:\msys64\usr\bin;${originalPath}`;
+        watcom_path = await tc.extractTar(watcom_tar_path, settings.location, "x");
+        process.env['Path'] = `${originalPath}`;
       } else {
         watcom_path = await tc.extractTar(watcom_tar_path, settings.location, "x");
       }
