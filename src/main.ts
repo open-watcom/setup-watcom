@@ -110,7 +110,7 @@ async function run(): Promise<void> {
     if (settings.archive_type == "tar") {
       if (process.platform == "win32") {
         const originalPath = process.env['Path'];
-        process.env['Path'] = `C:\msys64\usr\bin;${originalPath}`;
+        process.env['Path'] = `C:\\msys64\\usr\\bin;${originalPath}`;
         watcom_path = await tc.extractTar(watcom_tar_path, settings.location, "x");
         process.env['Path'] = `${originalPath}`;
       } else {
