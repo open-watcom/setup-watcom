@@ -4,6 +4,7 @@ import * as tc from "@actions/tool-cache";
 import * as path from "path";
 import * as fs from "fs";
 import * as child_process from "child_process";
+import * as exec from "@actions/exec";
 
 function getInputs(): ISetupWatcomSettings {
   let p_version = core.getInput("version");
@@ -108,9 +109,12 @@ async function run(): Promise<void> {
     let watcom_path: fs.PathLike = "";
     if (settings.archive_type == "tar") {
       if (process.platform == "win32") {
-        core.addPath("C:\\msys64\\usr\\bin");
+        exec.exec("C:\\windows\\system32\\tar.exe", ["xv", "-f", watcom_tar_path, "-C", settings.location]);
+        watcom_path = settings.location;
+      } else {
+        watcom_path = await tc.extractTar(watcom_tar_path, settings.location, "x");
       }
-      watcom_path = await tc.extractTar(watcom_tar_path, settings.location, "x");
+      core.info(`Archive extracted.`);
     } else if (settings.archive_type == "exe") {
       watcom_path = await tc.extractZip(watcom_tar_path, settings.location);
     }
