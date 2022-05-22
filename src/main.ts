@@ -108,7 +108,7 @@ async function run(): Promise<void> {
     let watcom_path: fs.PathLike = "";
     if (settings.archive_type == "tar") {
       if (process.platform == "win32") {
-        core.addPath("C:\msys64\usr\bin");
+        core.addPath("C:\\msys64\\usr\\bin");
       }
       watcom_path = await tc.extractTar(watcom_tar_path, settings.location, "x");
     } else if (settings.archive_type == "exe") {
