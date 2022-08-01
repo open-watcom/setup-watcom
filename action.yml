@@ -2,7 +2,7 @@ name: 'Setup Open Watcom'
 description: 'Setup an Open Watcom environment'
 branding:
   color: yellow
-  icon: download-cload
+  icon: download-cloud
 inputs:
   version:
     description: 'Open Watcom version: choices = [1.8, 1.9, 2.0, 2.0-64]'
