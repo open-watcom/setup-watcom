@@ -27,7 +27,7 @@
   },
   "homepage": "https://github.com/open-watcom/setup-watcom",
   "dependencies": {
-    "@actions/core": "^1.8.2",
+    "@actions/core": "^1.9.1",
     "@actions/tool-cache": "^2.0.0"
   },
   "devDependencies": {
