@@ -137,7 +137,7 @@ function run() {
             if (settings.archive_type == "tar" && process.platform == "win32") {
                 core.startGroup("Install GNU tar (MSYS).");
                 process.env["Path"] = `C:\\msys64\\usr\\bin;${originalPath}`;
-                yield exec.exec("pacman -S --noconfirm tar");
+                yield exec.exec("pacman -S --noconfirm --needed tar");
                 core.endGroup();
             }
             let watcom_tar_path;
