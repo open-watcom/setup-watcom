@@ -103,7 +103,7 @@ async function run(): Promise<void> {
     if (settings.archive_type == "tar" && process.platform == "win32") {
       core.startGroup("Install GNU tar (MSYS).");
       process.env["Path"] = `C:\\msys64\\usr\\bin;${originalPath}`;
-      await exec.exec("pacman -S --noconfirm tar");
+      await exec.exec("pacman -S --noconfirm --needed tar");
       core.endGroup();
     }
 
