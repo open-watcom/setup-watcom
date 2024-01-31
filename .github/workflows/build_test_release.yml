@@ -6,13 +6,13 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Build setup-watcom
         run: |
           ./build.sh
           mv packed/index.js index.js
       - name: Archive artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: action-artifact
           if-no-files-found: error
@@ -35,7 +35,7 @@ jobs:
           - "2.0-64"
     steps:
       - name: Download artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: action-artifact
       - name: "Run action"
@@ -57,7 +57,7 @@ jobs:
     runs-on: "ubuntu-latest"
     if: ${{ (github.repository == 'open-watcom/setup-watcom') && (github.ref_name == 'master') }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: Configure user
@@ -67,7 +67,7 @@ jobs:
       - name: Build setup-watcom
         run: |
           ./build.sh
-      - uses: actions/setup-python@v2
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.x'
       - name: Create release
