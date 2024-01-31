@@ -11,15 +11,12 @@ inputs:
   tag:
     description: 'Tag of snapshot to use: current, last or date. (only used for 2.0)'
     required: false
-    default: ''
   location:
     description: 'Location where Open Watcom should be extracted to (default=/opt/watcom or C:\\watcom)'
     required: false
-    default: ''
   environment:
     description: 'Set environment variables (WATCOM + PATH)'
     required: false
-    default: ''
 runs:
   using: 'node20'
   main: 'index.js'
