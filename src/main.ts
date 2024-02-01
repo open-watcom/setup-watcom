@@ -7,14 +7,14 @@ import * as child_process from "child_process";
 import * as exec from "@actions/exec";
 
 function getInputs(): ISetupWatcomSettings {
-  let p_version = core.getInput("version");
+  const p_version = core.getInput("version");
   const version_allowed = ["1.8", "1.9", "2.0", "2.0-64"];
 
   if (!version_allowed.includes(p_version.toLowerCase())) {
     throw new Error(
       `"version" needs to be one of ${version_allowed.join(
-        ", "
-      )}, got ${p_version}`
+        ", ",
+      )}, got ${p_version}`,
     );
   }
 
@@ -36,8 +36,7 @@ function getInputs(): ISetupWatcomSettings {
     if (tag in tag_aliases) {
       tag = tag_aliases[tag];
     }
-    p_url =
-      `https://github.com/open-watcom/open-watcom-v2/releases/download/${tag}/ow-snapshot.tar`;
+    p_url = `https://github.com/open-watcom/open-watcom-v2/releases/download/${tag}/ow-snapshot.tar`;
     p_archive_type = "tar";
   } else if (p_version == "1.9") {
     p_url = `https://github.com/open-watcom/open-watcom-1.9/releases/download/ow1.9/open-watcom-c-linux-1.9`;
@@ -76,7 +75,7 @@ function getInputs(): ISetupWatcomSettings {
     p_location = default_location;
   }
 
-  let p_environment = core.getBooleanInput("environment");
+  const p_environment = core.getBooleanInput("environment");
 
   return {
     version: p_version,
@@ -112,7 +111,7 @@ async function run(): Promise<void> {
       try {
         core.startGroup(`Downloading ${settings.url}.xz.`);
         watcom_tar_path = await tc.downloadTool(`${settings.url}.xz`);
-      } catch(error) {
+      } catch (error) {
         core.info("Downloading failed.");
         core.endGroup();
         core.startGroup(`Downloading ${settings.url}.gz.`);
@@ -125,13 +124,20 @@ async function run(): Promise<void> {
     core.info(`Watcom archive downloaded to ${watcom_tar_path}.`);
     core.endGroup();
 
-    core.startGroup(`Extracting to ${settings.location}.`)
+    core.startGroup(`Extracting to ${settings.location}.`);
     let watcom_path: fs.PathLike = "";
     if (settings.archive_type == "tar") {
       if (process.platform == "win32") {
-        watcom_path = await tc.extractTar(watcom_tar_path, settings.location, ["x", "--exclude=wlink"]);
+        watcom_path = await tc.extractTar(watcom_tar_path, settings.location, [
+          "x",
+          "--exclude=wlink",
+        ]);
       } else {
-        watcom_path = await tc.extractTar(watcom_tar_path, settings.location, "x");
+        watcom_path = await tc.extractTar(
+          watcom_tar_path,
+          settings.location,
+          "x",
+        );
       }
     } else if (settings.archive_type == "exe") {
       watcom_path = await tc.extractZip(watcom_tar_path, settings.location);
@@ -139,9 +145,16 @@ async function run(): Promise<void> {
     core.info(`Archive extracted.`);
     core.endGroup();
 
-    if (settings.archive_type == "exe" && settings.needs_chmod && process.platform != "win32") {
+    if (
+      settings.archive_type == "exe" &&
+      settings.needs_chmod &&
+      process.platform != "win32"
+    ) {
       core.startGroup(`Fixing file mode bits`);
-      child_process.exec("find . -regex \"./[a-z][a-z0-9]*\" -exec chmod a+x {} \\;", {cwd: path.join(watcom_path, settings.path_subdir)});
+      child_process.exec(
+        'find . -regex "./[a-z][a-z0-9]*" -exec chmod a+x {} \\;',
+        { cwd: path.join(watcom_path, settings.path_subdir) },
+      );
       core.endGroup();
     }
     if (settings.archive_type == "tar" && process.platform == "win32") {
@@ -151,8 +164,8 @@ async function run(): Promise<void> {
     if (settings.environment) {
       core.startGroup("Setting environment.");
       core.exportVariable("WATCOM", watcom_path);
-      core.info(`Setted WATCOM=${watcom_path}`)
-      let bin_path = path.join(watcom_path, settings.path_subdir);
+      core.info(`Setted WATCOM=${watcom_path}`);
+      const bin_path = path.join(watcom_path, settings.path_subdir);
       core.addPath(bin_path);
       core.info(`PATH appended with ${bin_path}.`);
       core.endGroup();

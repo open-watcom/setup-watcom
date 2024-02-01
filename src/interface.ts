@@ -14,7 +14,7 @@ export interface ISetupWatcomSettings {
   /**
    * Archive type
    */
-  archive_type: ArchiveType,
+  archive_type: ArchiveType;
 
   /**
    * The destination path
@@ -34,6 +34,5 @@ export interface ISetupWatcomSettings {
   /**
    * Need mode bits fix-up
    */
-  needs_chmod: boolean,
-
+  needs_chmod: boolean;
 }
