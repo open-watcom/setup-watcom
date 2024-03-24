@@ -85,14 +85,16 @@ function getInputs() {
     }
     let default_location;
     let p_path_subdir;
+    let p_inc_subdirs;
     if (process.platform === "win32") {
-        default_location = "C:\\watcom";
+        default_location = "C:\\WATCOM";
         if (p_version == "2.0-64") {
-            p_path_subdir = "binnt64";
+            p_path_subdir = "BINNT64";
         }
         else {
-            p_path_subdir = "binnt";
+            p_path_subdir = "BINNT";
         }
+        p_inc_subdirs = ["H", "H\\NT", "H\\NT\\DIRECTX", "H\\NT\\DDK"];
     }
     else if (process.platform === "darwin") {
         throw new Error("Unsupported platform");
@@ -105,6 +107,7 @@ function getInputs() {
         else {
             p_path_subdir = "binl";
         }
+        p_inc_subdirs = ["lh"];
     }
     let p_location = core.getInput("location");
     if (!p_location) {
@@ -118,6 +121,7 @@ function getInputs() {
         location: p_location,
         environment: p_environment,
         path_subdir: p_path_subdir,
+        inc_subdirs: p_inc_subdirs,
         needs_chmod: p_needs_chmod,
     };
 }
@@ -132,6 +136,7 @@ function run() {
             core.info(`location: ${settings.location}`);
             core.info(`environment: ${settings.environment}`);
             core.info(`path_subdir: ${settings.path_subdir}`);
+            core.info(`inc_subdirs: ${settings.inc_subdirs}`);
             core.endGroup();
             if (settings.archive_type == "tar" && process.platform == "win32") {
                 core.startGroup("Install GNU tar (MSYS).");
@@ -193,6 +198,17 @@ function run() {
                 const bin_path = path.join(watcom_path, settings.path_subdir);
                 core.addPath(bin_path);
                 core.info(`PATH appended with ${bin_path}.`);
+                const originalInclude = process.env["INCLUDE"];
+                const sep = (process.platform == "win32") ? ";" : ":";
+                let inc_path = "";
+                for (var x of settings.inc_subdirs) {
+                    inc_path = inc_path + path.join(watcom_path, x) + sep;
+                }
+                if (originalInclude) {
+                    inc_path = inc_path + originalInclude;
+                }
+                core.exportVariable("INCLUDE", inc_path);
+                core.info(`Setted INCLUDE=${inc_path}`);
                 core.endGroup();
             }
         }
