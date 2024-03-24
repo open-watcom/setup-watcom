@@ -6,7 +6,7 @@
 This action sets up watcom for use in actions by:
 
 - downloading a watcom release.
-- eventually setting the PATH and WATCOM environment variables.
+- set default Open Watcom environment variables (WATCOM + INCLUDE + PATH).
 - failing if the specific version of Open Watcom is not available for download.
 
 # Usage
@@ -21,7 +21,7 @@ steps:
   with:
     version: "2.0"
 - run: |
-    wcl386 -zq -d+ ${{ env.WATCOM }}/h -w3 -bt=dos -d2 -fomain.c.obj -c -cc main.c
+    wcl386 -zq -d+ -i"${{ env.WATCOM }}/h" -w3 -bt=dos -d2 -fomain.c.obj -c -cc main.c
     wlink option quiet name hello.exe opt map system dos4g debug all file main.c.obj
 - run: |
     cmake -S . -B build -G "Watcom WMake" -D CMAKE_SYSTEM_NAME=DOS
