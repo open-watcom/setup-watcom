@@ -83,11 +83,9 @@ function getInputs() {
     else {
         throw new Error("Unsupported version");
     }
-    let default_location;
     let p_path_subdir;
     let p_inc_subdirs;
     if (process.platform === "win32") {
-        default_location = "C:\\WATCOM";
         if (p_version == "2.0-64") {
             p_path_subdir = "BINNT64";
         }
@@ -97,10 +95,21 @@ function getInputs() {
         p_inc_subdirs = ["H", "H\\NT", "H\\NT\\DIRECTX", "H\\NT\\DDK"];
     }
     else if (process.platform === "darwin") {
-        throw new Error("Unsupported platform");
+        if (p_version !== "2.0-64") {
+            throw new Error("Unsupported platform");
+        }
+        if (process.arch === 'arm64') {
+            p_path_subdir = "armo64";
+        }
+        else if (process.arch === 'x64') {
+            p_path_subdir = "bino64";
+        }
+        else {
+            throw new Error("Unsupported platform");
+        }
+        p_inc_subdirs = ["lh"];
     }
     else {
-        default_location = "/opt/watcom";
         if (p_version == "2.0-64") {
             p_path_subdir = "binl64";
         }
@@ -111,7 +120,14 @@ function getInputs() {
     }
     let p_location = core.getInput("location");
     if (!p_location) {
-        p_location = default_location;
+        if (process.platform === "win32") {
+            const home_path = process.env["USERPROFILE"] + "";
+            p_location = path.join(home_path, "WATCOM");
+        }
+        else {
+            const home_path = process.env["HOME"] + "";
+            p_location = path.join(home_path, "watcom");
+        }
     }
     const p_environment = core.getBooleanInput("environment");
     return {
