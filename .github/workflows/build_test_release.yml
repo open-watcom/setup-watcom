@@ -35,6 +35,11 @@ jobs:
           - "1.9"
           - "2.0"
           - "2.0-64"
+        include:
+        - runner:  macos-latest
+          version: "2.0-64"
+        - runner:  macos-14
+          version: "2.0-64"
     steps:
       - name: Download artifact
         uses: actions/download-artifact@v4
