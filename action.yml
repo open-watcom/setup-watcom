@@ -13,7 +13,7 @@ inputs:
     required: false
     default: ''
   location:
-    description: 'Location where Open Watcom should be extracted to (default=/opt/watcom or C:\\WATCOM)'
+    description: 'Location where Open Watcom should be extracted to (default=$HOME/watcom or %USERPROFILE%\\WATCOM)'
     required: false
     default: ''
   environment:
