@@ -20,6 +20,10 @@ inputs:
     description: 'Set default Open Watcom environment variables (WATCOM + INCLUDE + PATH)'
     required: false
     default: true
+  target:
+    description: 'Set target OS specific Open Watcom header search path (INCLUDE)'
+    required: false
+    default: ''
 runs:
   using: 'node20'
   main: 'index.js'
