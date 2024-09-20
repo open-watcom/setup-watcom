@@ -47,8 +47,13 @@ const exec = __importStar(__nccwpck_require__(1514));
 function getInputs() {
     const p_version = core.getInput("version");
     const version_allowed = ["1.8", "1.9", "2.0", "2.0-64"];
+    const p_target = core.getInput("target");
+    const target_allowed = ["", "dos", "win", "nt", "os2", "os2-16", "linux"];
     if (!version_allowed.includes(p_version.toLowerCase())) {
         throw new Error(`"version" needs to be one of ${version_allowed.join(", ")}, got ${p_version}`);
+    }
+    if (!target_allowed.includes(p_target.toLowerCase())) {
+        throw new Error(`"target" needs to be one of ${target_allowed.join(", ")}, got ${p_target}`);
     }
     let p_url;
     let p_needs_chmod = false;
@@ -92,7 +97,6 @@ function getInputs() {
         else {
             p_path_subdir = "BINNT";
         }
-        p_inc_subdirs = ["H", "H\\NT", "H\\NT\\DIRECTX", "H\\NT\\DDK"];
     }
     else if (process.platform === "darwin") {
         if (p_version !== "2.0-64") {
@@ -107,7 +111,6 @@ function getInputs() {
         else {
             throw new Error("Unsupported platform");
         }
-        p_inc_subdirs = ["lh"];
     }
     else {
         if (p_version == "2.0-64") {
@@ -116,7 +119,50 @@ function getInputs() {
         else {
             p_path_subdir = "binl";
         }
-        p_inc_subdirs = ["lh"];
+    }
+    if (process.platform === "win32") {
+        switch (p_target) {
+            case "dos":
+                p_inc_subdirs = ["H"];
+                break;
+            case "win":
+                p_inc_subdirs = ["H", "H\\WIN"];
+                break;
+            case "os2":
+                p_inc_subdirs = ["H", "H\\OS2"];
+                break;
+            case "os2-16":
+                p_inc_subdirs = ["H", "H\\OS21X"];
+                break;
+            case "linux":
+                p_inc_subdirs = ["LH"];
+                break;
+            case "nt":
+            default:
+                p_inc_subdirs = ["H", "H\\NT", "H\\NT\\DIRECTX", "H\\NT\\DDK"];
+        }
+    }
+    else {
+        switch (p_target) {
+            case "dos":
+                p_inc_subdirs = ["h"];
+                break;
+            case "win":
+                p_inc_subdirs = ["h", "h/win"];
+                break;
+            case "nt":
+                p_inc_subdirs = ["h", "h/nt", "h/nt/directx", "h/nt/ddk"];
+                break;
+            case "os2":
+                p_inc_subdirs = ["h", "h/os2"];
+                break;
+            case "os2-16":
+                p_inc_subdirs = ["h", "h/os21x"];
+                break;
+            case "linux":
+            default:
+                p_inc_subdirs = ["lh"];
+        }
     }
     let p_location = core.getInput("location");
     if (!p_location) {
