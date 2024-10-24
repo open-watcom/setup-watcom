@@ -64,26 +64,26 @@ function getInputs(): ISetupWatcomSettings {
   let p_inc_subdirs: string[];
   if (process.platform === "win32") {
     if (p_version == "2.0-64") {
-      p_path_subdirs = ["BINNT64", "BINNT", "BINW"];
+      p_path_subdirs = ["BINNT64", "BINNT"];
     } else {
-      p_path_subdirs = ["BINNT", "BINW"];
+      p_path_subdirs = ["BINNT"];
     }
   } else if (process.platform === "darwin") {
     if (p_version !== "2.0-64") {
       throw new Error("Unsupported platform");
     }
     if (process.arch === 'arm64') {
-      p_path_subdirs = ["armo64", "binw"];
+      p_path_subdirs = ["armo64"];
     } else if (process.arch === 'x64') {
-      p_path_subdirs = ["bino64", "binw"];
+      p_path_subdirs = ["bino64"];
     } else {
       throw new Error("Unsupported platform");
     }
   } else {
     if (p_version == "2.0-64") {
-      p_path_subdirs = ["binl64", "binl", "binw"];
+      p_path_subdirs = ["binl64", "binl"];
     } else {
-      p_path_subdirs = ["binl", "binw"];
+      p_path_subdirs = ["binl"];
     }
   }
   if (process.platform === "win32") {
@@ -158,7 +158,7 @@ function getInputs(): ISetupWatcomSettings {
 async function run(): Promise<void> {
   try {
     core.startGroup("Initializing action.");
-    const originalPath = process.env["Path"];
+    const originalPath = process.env["PATH"];
     const settings = getInputs();
     core.info(`version: ${settings.version}`);
     core.info(`url: ${settings.url}`);
@@ -169,7 +169,7 @@ async function run(): Promise<void> {
     core.endGroup();
     if (settings.archive_type == "tar" && process.platform == "win32") {
       core.startGroup("Install GNU tar (MSYS).");
-      process.env["Path"] = `C:\\msys64\\usr\\bin;${originalPath}`;
+      process.env["PATH"] = `C:\\msys64\\usr\\bin;${originalPath}`;
       await exec.exec("pacman -S --noconfirm --needed tar");
       core.endGroup();
     }
@@ -219,25 +219,33 @@ async function run(): Promise<void> {
       process.platform != "win32"
     ) {
       core.startGroup(`Fixing file mode bits`);
-      child_process.exec(
-        'find . -regex "./[a-z][a-z0-9]*" -exec chmod a+x {} \\;',
-        { cwd: path.join(watcom_path, settings.path_subdirs) },
-      );
+      for (var x of settings.path_subdirs) {
+        child_process.exec(
+          'find . -regex "./[a-z][a-z0-9]*" -exec chmod a+x {} \\;',
+          { cwd: path.join(watcom_path, x) },
+        );
+      }
       core.endGroup();
     }
     if (settings.archive_type == "tar" && process.platform == "win32") {
-      process.env["Path"] = `${originalPath}`;
+      process.env["PATH"] = `${originalPath}`;
     }
 
     if (settings.environment) {
       core.startGroup("Setting environment.");
       core.exportVariable("WATCOM", watcom_path);
       core.info(`Setted WATCOM=${watcom_path}`);
-      const bin_path = path.join(watcom_path, settings.path_subdirs);
-      core.addPath(bin_path);
-      core.info(`PATH appended with ${bin_path}.`);
-      const originalInclude = process.env["INCLUDE"];
       const sep = (process.platform == "win32") ? ";" : ":";
+      const additional_path = (process.platform == "win32") ? "BINW" : "binw";
+      let bin_path = "";
+      for (var x of settings.path_subdirs) {
+        bin_path = bin_path + path.join(watcom_path, x) + sep;
+      }
+      bin_path = bin_path + path.join(watcom_path, additional_path);
+      core.addPath(bin_path);
+      const new_path = process.env["PATH"];
+      core.info(`Setted PATH=${new_path}`);
+      const originalInclude = process.env["INCLUDE"];
       let inc_path = "";
       for (var x of settings.inc_subdirs) {
         inc_path = inc_path + path.join(watcom_path, x) + sep;
