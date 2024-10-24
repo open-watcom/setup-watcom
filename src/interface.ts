@@ -30,7 +30,7 @@ export interface ISetupWatcomSettings {
   /**
    * Watcom subdir containing the native binaries (for host OS)
    */
-  path_subdir: string;
+  path_subdirs: string[];
 
   /**
    * List of Watcom subdirs containing the default header files (for host OS)

@@ -60,30 +60,30 @@ function getInputs(): ISetupWatcomSettings {
     throw new Error("Unsupported version");
   }
 
-  let p_path_subdir: string;
+  let p_path_subdirs: string[];
   let p_inc_subdirs: string[];
   if (process.platform === "win32") {
     if (p_version == "2.0-64") {
-      p_path_subdir = "BINNT64";
+      p_path_subdirs = ["BINNT64", "BINNT", "BINW"];
     } else {
-      p_path_subdir = "BINNT";
+      p_path_subdirs = ["BINNT", "BINW"];
     }
   } else if (process.platform === "darwin") {
     if (p_version !== "2.0-64") {
       throw new Error("Unsupported platform");
     }
     if (process.arch === 'arm64') {
-      p_path_subdir = "armo64";
+      p_path_subdirs = ["armo64", "binw"];
     } else if (process.arch === 'x64') {
-      p_path_subdir = "bino64";
+      p_path_subdirs = ["bino64", "binw"];
     } else {
       throw new Error("Unsupported platform");
     }
   } else {
     if (p_version == "2.0-64") {
-      p_path_subdir = "binl64";
+      p_path_subdirs = ["binl64", "binl", "binw"];
     } else {
-      p_path_subdir = "binl";
+      p_path_subdirs = ["binl", "binw"];
     }
   }
   if (process.platform === "win32") {
@@ -149,7 +149,7 @@ function getInputs(): ISetupWatcomSettings {
     archive_type: p_archive_type,
     location: p_location,
     environment: p_environment,
-    path_subdir: p_path_subdir,
+    path_subdirs: p_path_subdirs,
     inc_subdirs: p_inc_subdirs,
     needs_chmod: p_needs_chmod,
   };
@@ -164,7 +164,7 @@ async function run(): Promise<void> {
     core.info(`url: ${settings.url}`);
     core.info(`location: ${settings.location}`);
     core.info(`environment: ${settings.environment}`);
-    core.info(`path_subdir: ${settings.path_subdir}`);
+    core.info(`path_subdirs: ${settings.path_subdirs}`);
     core.info(`inc_subdirs: ${settings.inc_subdirs}`);
     core.endGroup();
     if (settings.archive_type == "tar" && process.platform == "win32") {
@@ -221,7 +221,7 @@ async function run(): Promise<void> {
       core.startGroup(`Fixing file mode bits`);
       child_process.exec(
         'find . -regex "./[a-z][a-z0-9]*" -exec chmod a+x {} \\;',
-        { cwd: path.join(watcom_path, settings.path_subdir) },
+        { cwd: path.join(watcom_path, settings.path_subdirs) },
       );
       core.endGroup();
     }
@@ -233,7 +233,7 @@ async function run(): Promise<void> {
       core.startGroup("Setting environment.");
       core.exportVariable("WATCOM", watcom_path);
       core.info(`Setted WATCOM=${watcom_path}`);
-      const bin_path = path.join(watcom_path, settings.path_subdir);
+      const bin_path = path.join(watcom_path, settings.path_subdirs);
       core.addPath(bin_path);
       core.info(`PATH appended with ${bin_path}.`);
       const originalInclude = process.env["INCLUDE"];
