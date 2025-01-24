@@ -81,7 +81,13 @@ function getInputs(): ISetupWatcomSettings {
     }
   } else {
     if (p_version == "2.0-64") {
-      p_path_subdirs = ["binl64", "binl"];
+      if (process.arch === 'arm64') {
+        p_path_subdirs = ["arml64"];
+      } else if (process.arch === 'x64') {
+        p_path_subdirs = ["binl64", "binl"];
+      } else {
+        throw new Error("Unsupported platform");
+      }
     } else {
       p_path_subdirs = ["binl"];
     }
@@ -231,31 +237,37 @@ async function run(): Promise<void> {
       process.env["PATH"] = `${originalPath}`;
     }
 
-    if (settings.environment) {
-      core.startGroup("Setting environment.");
-      core.exportVariable("WATCOM", watcom_path);
-      core.info(`Setted WATCOM=${watcom_path}`);
-      const sep = (process.platform == "win32") ? ";" : ":";
-      const additional_path = (process.platform == "win32") ? "BINW" : "binw";
-      let bin_path = "";
-      for (var x of settings.path_subdirs) {
-        bin_path = bin_path + path.join(watcom_path, x) + sep;
+    let tmpp = path.join(watcom_path, settings.path_subdirs[0]);
+    core.info(`Check directory ${tmpp}.`);
+    if (fs.existsSync(tmpp)) {
+      if (settings.environment) {
+        core.startGroup("Setting environment.");
+        core.exportVariable("WATCOM", watcom_path);
+        core.info(`Setted WATCOM=${watcom_path}`);
+        const sep = (process.platform == "win32") ? ";" : ":";
+        const additional_path = (process.platform == "win32") ? "BINW" : "binw";
+        let bin_path = "";
+        for (var x of settings.path_subdirs) {
+          bin_path = bin_path + path.join(watcom_path, x) + sep;
+        }
+        bin_path = bin_path + path.join(watcom_path, additional_path);
+        core.addPath(bin_path);
+        const new_path = process.env["PATH"];
+        core.info(`Setted PATH=${new_path}`);
+        const originalInclude = process.env["INCLUDE"];
+        let inc_path = "";
+        for (var x of settings.inc_subdirs) {
+          inc_path = inc_path + path.join(watcom_path, x) + sep;
+        }
+        if (originalInclude) {
+          inc_path = inc_path + originalInclude;
+        }
+        core.exportVariable("INCLUDE", inc_path);
+        core.info(`Setted INCLUDE=${inc_path}`);
+        core.endGroup();
       }
-      bin_path = bin_path + path.join(watcom_path, additional_path);
-      core.addPath(bin_path);
-      const new_path = process.env["PATH"];
-      core.info(`Setted PATH=${new_path}`);
-      const originalInclude = process.env["INCLUDE"];
-      let inc_path = "";
-      for (var x of settings.inc_subdirs) {
-        inc_path = inc_path + path.join(watcom_path, x) + sep;
-      }
-      if (originalInclude) {
-        inc_path = inc_path + originalInclude;
-      }
-      core.exportVariable("INCLUDE", inc_path);
-      core.info(`Setted INCLUDE=${inc_path}`);
-      core.endGroup();
+    } else {
+      throw new Error("OW image doesn't contain the required directory.");
     }
   } catch (error) {
     if (error instanceof Error) {

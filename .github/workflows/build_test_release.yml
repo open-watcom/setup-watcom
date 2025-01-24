@@ -36,9 +36,14 @@ jobs:
           - "2.0"
           - "2.0-64"
         include:
-        - runner:  macos-13
+        # Intel
+        - runner:  'macos-13'
           version: "2.0-64"
-        - runner:  macos-14
+        # ARM
+        - runner:  'macos-14'
+          version: "2.0-64"
+        # ARM
+        - runner:  'ubuntu-24.04-arm'
           version: "2.0-64"
     steps:
       - name: Download artifact
