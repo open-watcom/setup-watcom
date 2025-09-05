@@ -38,6 +38,8 @@ function getInputs(): ISetupWatcomSettings {
     let tag = core.getInput("tag");
     if (!tag) {
       tag = tag_default;
+    } else {
+      tag.replaceAll(" ", "-");
     }
     const tag_aliases: { [v: string]: string } = {
       current: "Current-build",
