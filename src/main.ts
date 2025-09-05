@@ -39,7 +39,7 @@ function getInputs(): ISetupWatcomSettings {
     if (!tag) {
       tag = tag_default;
     } else {
-      tag.replaceAll(" ", "-");
+      tag.replace(/ /g, "-");
     }
     const tag_aliases: { [v: string]: string } = {
       current: "Current-build",
