@@ -66,6 +66,9 @@ function getInputs() {
         if (!tag) {
             tag = tag_default;
         }
+        else {
+            tag.replace(/ /g, "-");
+        }
         const tag_aliases = {
             current: "Current-build",
             last: "Last-CI-build",
