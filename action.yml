@@ -21,7 +21,7 @@ inputs:
     required: false
     default: true
   target:
-    description: 'Set target OS specific Open Watcom header search path (INCLUDE)'
+    description: 'Set target OS (one of values "", "dos", "win", "nt", "os2", "os2-16", "linux"), change header search path (INCLUDE)'
     required: false
     default: ''
 runs:
