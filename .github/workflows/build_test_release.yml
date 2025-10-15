@@ -22,7 +22,7 @@ jobs:
             index.js
 
   test:
-    name: "OpenWatcom ${{ matrix.version }} on ${{ matrix.runner }}"
+    name: "OW ${{ matrix.version }} on ${{ matrix.runner }}"
     needs: build
     runs-on: ${{ matrix.runner }}
     strategy:
@@ -37,10 +37,12 @@ jobs:
           - "2.0-64"
         include:
         # Intel
-        - runner:  'macos-13'
+        - runner:  'macos-15-intel'
           version: "2.0-64"
         # ARM
         - runner:  'macos-14'
+          version: "2.0-64"
+        - runner:  'macos-15'
           version: "2.0-64"
         # ARM
         - runner:  'ubuntu-24.04-arm'
