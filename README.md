@@ -13,7 +13,7 @@ This action sets up watcom for use in actions by:
 
 See [action.yml](action.yml)
 
-Basic:
+Basic use for DOS target:
 ```yaml
 steps:
 - uses: actions/checkout@v2
@@ -22,8 +22,17 @@ steps:
     version: "2.0"
     target:  "dos"
 - run: |
-    wcl386 -zq -d+ -i"${{ env.WATCOM }}/h" -w3 -bt=dos -d2 -fomain.c.obj -c -cc main.c
+    wcl386 -zq -d+ -w3 -bt=dos -d2 -fomain.c.obj -c -cc main.c
     wlink option quiet name hello.exe opt map system dos4g debug all file main.c.obj
+```
+or for use with CMake
+```yaml
+steps:
+- uses: actions/checkout@v2
+- uses: open-watcom/setup-watcom@v0
+  with:
+    version: "2.0"
+    target:  "dos"
 - run: |
     cmake -S . -B build -G "Watcom WMake" -D CMAKE_SYSTEM_NAME=DOS
     cmake --build build
