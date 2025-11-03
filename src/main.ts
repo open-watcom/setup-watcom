@@ -250,7 +250,7 @@ async function run(): Promise<void> {
         /*
          * process PATH 
          */
-        let listp[] = settings.path_subdirs;
+        const listp = settings.path_subdirs.slice();
         listp.push((process.platform == "win32") ? "BINW" : "binw");
         let bin_path = "";
         for (var x of listp) {
@@ -266,7 +266,7 @@ async function run(): Promise<void> {
         /*
          * process INCLUDE 
          */
-        let listi[] = settings.inc_subdirs;
+        const listi = settings.inc_subdirs.slice();
         listi.push(process.env["INCLUDE"]);
         let inc_path = "";
         for (var x of listi) {
