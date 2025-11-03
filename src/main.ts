@@ -247,25 +247,38 @@ async function run(): Promise<void> {
         core.exportVariable("WATCOM", watcom_path);
         core.info(`Setted WATCOM=${watcom_path}`);
         const sep = (process.platform == "win32") ? ";" : ":";
-        const additional_path = (process.platform == "win32") ? "BINW" : "binw";
+        /*
+         * process PATH 
+         */
+        let listp[] = settings.path_subdirs;
+        listp.push((process.platform == "win32") ? "BINW" : "binw");
         let bin_path = "";
-        for (var x of settings.path_subdirs) {
-          bin_path = bin_path + path.join(watcom_path, x) + sep;
+        for (var x of listp) {
+          if (bin_path == "") {
+            bin_path = path.join(watcom_path, x);
+          } else {
+            bin_path = bin_path + sep + path.join(watcom_path, x);
+          }
         }
-        bin_path = bin_path + path.join(watcom_path, additional_path);
         core.addPath(bin_path);
         const new_path = process.env["PATH"];
         core.info(`Setted PATH=${new_path}`);
-        const originalInclude = process.env["INCLUDE"];
+        /*
+         * process INCLUDE 
+         */
+        let listi[] = settings.inc_subdirs;
+        listi.push(process.env["INCLUDE"]);
         let inc_path = "";
-        for (var x of settings.inc_subdirs) {
-          inc_path = inc_path + path.join(watcom_path, x) + sep;
-        }
-        if (originalInclude) {
-          inc_path = inc_path + originalInclude;
+        for (var x of listi) {
+          if (inc_path == "") {
+            inc_path = path.join(watcom_path, x);
+          } else {
+            inc_path = inc_path + sep + path.join(watcom_path, x);
+          }
         }
         core.exportVariable("INCLUDE", inc_path);
-        core.info(`Setted INCLUDE=${inc_path}`);
+        const new_incs = process.env["INCLUDE"];
+        core.info(`Setted INCLUDE=${new_incs}`);
         core.endGroup();
       }
     } else {
