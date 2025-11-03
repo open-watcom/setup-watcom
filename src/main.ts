@@ -267,7 +267,10 @@ async function run(): Promise<void> {
          * process INCLUDE 
          */
         const listi = settings.inc_subdirs.slice();
-        listi.push(process.env["INCLUDE"]);
+        const oldi = process.env["INCLUDE"];
+        if (oldi) {
+          listi.push(oldi);
+        }
         let inc_path = "";
         for (var x of listi) {
           if (inc_path == "") {
