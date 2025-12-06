@@ -10,7 +10,7 @@ function getInputs(): ISetupWatcomSettings {
   const p_version = core.getInput("version");
   const version_allowed = ["1.8", "1.9", "2.0", "2.0-64"];
   const p_target = core.getInput("target");
-  const target_allowed = ["", "dos", "win", "nt", "os2", "os2-16", "linux"];
+  const target_allowed = ["", "dos", "win", "nt", "os2", "os2-16", "linux", "rdos"];
 
   if (!version_allowed.includes(p_version.toLowerCase())) {
     throw new Error(
@@ -111,6 +111,13 @@ function getInputs(): ISetupWatcomSettings {
     case "linux":
       p_inc_subdirs = ["LH"];
       break;
+    case "rdos":
+      if (p_version == "2.0" || p_version == "2.0-64") {
+        p_inc_subdirs = ["RH"];
+      } else {
+        throw new Error("Unsupported target");
+      }
+      break;
     case "nt":
     default:
       p_inc_subdirs = ["H", "H\\NT", "H\\NT\\DIRECTX", "H\\NT\\DDK"];
@@ -131,6 +138,13 @@ function getInputs(): ISetupWatcomSettings {
       break;
     case "os2-16":
       p_inc_subdirs = ["h", "h/os21x"];
+      break;
+    case "rdos":
+      if (p_version == "2.0" || p_version == "2.0-64") {
+        p_inc_subdirs = ["rh"];
+      } else {
+        throw new Error("Unsupported target");
+      }
       break;
     case "linux":
     default:
