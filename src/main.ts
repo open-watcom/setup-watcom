@@ -10,7 +10,16 @@ function getInputs(): ISetupWatcomSettings {
   const p_version = core.getInput("version");
   const version_allowed = ["1.8", "1.9", "2.0", "2.0-64"];
   const p_target = core.getInput("target");
-  const target_allowed = ["", "dos", "win", "nt", "os2", "os2-16", "linux", "rdos"];
+  const target_allowed = [
+    "",
+    "dos",
+    "win",
+    "nt",
+    "os2",
+    "os2-16",
+    "linux",
+    "rdos",
+  ];
 
   if (!version_allowed.includes(p_version.toLowerCase())) {
     throw new Error(
@@ -74,18 +83,18 @@ function getInputs(): ISetupWatcomSettings {
     if (p_version !== "2.0-64") {
       throw new Error("Unsupported platform");
     }
-    if (process.arch === 'arm64') {
+    if (process.arch === "arm64") {
       p_path_subdirs = ["armo64"];
-    } else if (process.arch === 'x64') {
+    } else if (process.arch === "x64") {
       p_path_subdirs = ["bino64"];
     } else {
       throw new Error("Unsupported platform");
     }
   } else {
     if (p_version == "2.0-64") {
-      if (process.arch === 'arm64') {
+      if (process.arch === "arm64") {
         p_path_subdirs = ["arml64"];
-      } else if (process.arch === 'x64') {
+      } else if (process.arch === "x64") {
         p_path_subdirs = ["binl64", "binl"];
       } else {
         throw new Error("Unsupported platform");
@@ -96,59 +105,59 @@ function getInputs(): ISetupWatcomSettings {
   }
   if (process.platform === "win32") {
     switch (p_target) {
-    case "dos":
-      p_inc_subdirs = ["H"];
-      break;
-    case "win":
-      p_inc_subdirs = ["H", "H\\WIN"];
-      break;
-    case "os2":
-      p_inc_subdirs = ["H", "H\\OS2"];
-      break;
-    case "os2-16":
-      p_inc_subdirs = ["H", "H\\OS21X"];
-      break;
-    case "linux":
-      p_inc_subdirs = ["LH"];
-      break;
-    case "rdos":
-      if (p_version == "2.0" || p_version == "2.0-64") {
-        p_inc_subdirs = ["RH"];
-      } else {
-        throw new Error("Unsupported target");
-      }
-      break;
-    case "nt":
-    default:
-      p_inc_subdirs = ["H", "H\\NT", "H\\NT\\DIRECTX", "H\\NT\\DDK"];
+      case "dos":
+        p_inc_subdirs = ["H"];
+        break;
+      case "win":
+        p_inc_subdirs = ["H", "H\\WIN"];
+        break;
+      case "os2":
+        p_inc_subdirs = ["H", "H\\OS2"];
+        break;
+      case "os2-16":
+        p_inc_subdirs = ["H", "H\\OS21X"];
+        break;
+      case "linux":
+        p_inc_subdirs = ["LH"];
+        break;
+      case "rdos":
+        if (p_version == "2.0" || p_version == "2.0-64") {
+          p_inc_subdirs = ["RH"];
+        } else {
+          throw new Error("Unsupported target");
+        }
+        break;
+      case "nt":
+      default:
+        p_inc_subdirs = ["H", "H\\NT", "H\\NT\\DIRECTX", "H\\NT\\DDK"];
     }
   } else {
     switch (p_target) {
-    case "dos":
-      p_inc_subdirs = ["h"];
-      break;
-    case "win":
-      p_inc_subdirs = ["h", "h/win"];
-      break;
-    case "nt":
-      p_inc_subdirs = ["h", "h/nt", "h/nt/directx", "h/nt/ddk"];
-      break;
-    case "os2":
-      p_inc_subdirs = ["h", "h/os2"];
-      break;
-    case "os2-16":
-      p_inc_subdirs = ["h", "h/os21x"];
-      break;
-    case "rdos":
-      if (p_version == "2.0" || p_version == "2.0-64") {
-        p_inc_subdirs = ["rh"];
-      } else {
-        throw new Error("Unsupported target");
-      }
-      break;
-    case "linux":
-    default:
-      p_inc_subdirs = ["lh"];
+      case "dos":
+        p_inc_subdirs = ["h"];
+        break;
+      case "win":
+        p_inc_subdirs = ["h", "h/win"];
+        break;
+      case "nt":
+        p_inc_subdirs = ["h", "h/nt", "h/nt/directx", "h/nt/ddk"];
+        break;
+      case "os2":
+        p_inc_subdirs = ["h", "h/os2"];
+        break;
+      case "os2-16":
+        p_inc_subdirs = ["h", "h/os21x"];
+        break;
+      case "rdos":
+        if (p_version == "2.0" || p_version == "2.0-64") {
+          p_inc_subdirs = ["rh"];
+        } else {
+          throw new Error("Unsupported target");
+        }
+        break;
+      case "linux":
+      default:
+        p_inc_subdirs = ["lh"];
     }
   }
 
@@ -260,12 +269,12 @@ async function run(): Promise<void> {
         core.startGroup("Setting environment.");
         core.exportVariable("WATCOM", watcom_path);
         core.info(`Setted WATCOM=${watcom_path}`);
-        const sep = (process.platform == "win32") ? ";" : ":";
+        const sep = process.platform == "win32" ? ";" : ":";
         /*
-         * process PATH 
+         * process PATH
          */
         const listp = settings.path_subdirs.slice();
-        listp.push((process.platform == "win32") ? "BINW" : "binw");
+        listp.push(process.platform == "win32" ? "BINW" : "binw");
         let bin_path = "";
         for (var x of listp) {
           if (bin_path == "") {
@@ -278,7 +287,7 @@ async function run(): Promise<void> {
         const new_path = process.env["PATH"];
         core.info(`Setted PATH=${new_path}`);
         /*
-         * process INCLUDE 
+         * process INCLUDE
          */
         const listi = settings.inc_subdirs.slice();
         const oldi = process.env["INCLUDE"];

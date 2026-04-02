@@ -27,17 +27,21 @@
   },
   "homepage": "https://github.com/open-watcom/setup-watcom",
   "dependencies": {
-    "@actions/core": "^1.10.0",
-    "@actions/tool-cache": "^2.0.1"
+    "@actions/core": "^1.11.1",
+    "@actions/tool-cache": "^2.0.2"
   },
   "devDependencies": {
-    "@types/node": "^20.11.16",
-    "@typescript-eslint/parser": "^6.18.1",
+    "@actions/http-client": "^3.0.2",
+    "@types/node": "^24.12.0",
     "@vercel/ncc": "^0.38.1",
-    "eslint": "^8.33.0",
-    "eslint-plugin-github": "^4.3.6",
+    "eslint": "^9.39.4",
+    "eslint-plugin-github": "^6.0.0",
     "js-yaml": "^4.1.0",
     "prettier": "3.1.1",
     "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=24.0.0",
+    "npm": ">=11.0.0"
   }
 }

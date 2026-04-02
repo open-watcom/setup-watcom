@@ -11,7 +11,7 @@ import tarfile
 
 ROOT = pathlib.Path(__file__).resolve().parent
 
-VALID_VERSION_SERIES = ("v0", )
+VALID_VERSION_SERIES = ("v0", "v1", )
 RELEASE_FILES = [
   "README.md",
   "LICENSE",
