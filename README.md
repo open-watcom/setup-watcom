@@ -1,5 +1,11 @@
 # Setup Watcom
 
+## setup-watcom v1
+
+### What's new
+
+- migration to support node24.js
+
 **setup-watcom** is a JavaScript GitHub Action (GHA) to setup an [Open Watcom](https://github.com/open-watcom) environment
  using the GHA [toolkit](https://github.com/actions/toolkit) for automatic caching.
 
