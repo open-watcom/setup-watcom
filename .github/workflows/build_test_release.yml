@@ -49,7 +49,7 @@ jobs:
           version: "2.0-64"
     steps:
       - name: Download artifact
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: action-artifact
       - name: "Run action"
