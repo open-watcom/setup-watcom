@@ -2,8 +2,6 @@
 
 ## v1
 
-### What's new
-
 - migration to support node24.js
 
 ## v0
@@ -24,8 +22,8 @@ See [action.yml](action.yml)
 Basic use for DOS target:
 ```yaml
 steps:
-- uses: actions/checkout@v2
-- uses: open-watcom/setup-watcom@v0
+- uses: actions/checkout@v6
+- uses: open-watcom/setup-watcom@v1
   with:
     version: "2.0"
     target:  "dos"
@@ -36,8 +34,8 @@ steps:
 or for use with CMake
 ```yaml
 steps:
-- uses: actions/checkout@v2
-- uses: open-watcom/setup-watcom@v0
+- uses: actions/checkout@v6
+- uses: open-watcom/setup-watcom@v1
   with:
     version: "2.0"
     target:  "dos"
