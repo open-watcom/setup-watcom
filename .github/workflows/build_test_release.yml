@@ -54,7 +54,7 @@ jobs:
           name: action-artifact
       - name: "Run action"
         run: |
-          node index.js
+          node24 index.js
         env:
           INPUT_VERSION: "${{ matrix.version }}"
           INPUT_TAG: ""
