@@ -1,0 +1,19 @@
+Notes for new version creating.
+
+1. create new branch v?-build by git command line statements (localy)
+  replace ? by appropriate number
+  - git switch --orphan v?-build
+  - git commit --allow-empty -m 'Initial commit'
+  - git push
+
+2. modify following files and submit it to repository
+  replace ? by appropriate number
+  - release.py on line VALID_VERSION_SERIES = ("v0", "v1", ) add new versions to the list
+  - .github/workflows/build_test_release.yml  change line ./release.py v?
+  submit these changes, it create new version in repository
+
+3. create and submit all changes which is necessary
+  don't forgot update readme.md
+
+for regular development repeat step 3. (no version change)
+if you decide to create new version then start with step 1. and 2. and continue with step 3.
