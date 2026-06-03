@@ -31,7 +31,7 @@
     "@actions/tool-cache": "^2.0.2"
   },
   "devDependencies": {
-    "@actions/http-client": "^3.0.2",
+    "@actions/http-client": "^4.0.1",
     "@types/node": "^24.12.0",
     "@vercel/ncc": "^0.38.1",
     "eslint": "^9.39.4",
